@@ -25,62 +25,36 @@ Section SubseqPerm.
   Proof.
     apply: (iffP allP) => /= [Hcountle12|[s3 Hss13 /permP Heqcount] x _]; last first.
     { rewrite -Heqcount. by apply subseq_count. }
-    elim: s1 s2 Hcountle12 => [|x s1 IHs1] s2 Hcountle12.
-    { exists s2 => //. by apply sub0seq. }
+    exists (s1 ++ foldr (@rem T) s2 s1); first by apply prefix_subseq.
+    elim: s1 s2 Hcountle12 => [//|x s1 IHs1] s2 Hcountle12.
+    have aIHs1 : perm_eq (s1 ++ foldr (@rem T) s2 s1) s2.
     {
-      elim: s2 Hcountle12 => [|y s2 IHs2] Hcountle12.
+      apply IHs1 => w Hmemw.
+      have Hcountw : (count_mem w) (x :: s1) <= (count_mem w) s2.
       {
-        have Hle := Hcountle12 x (mem_head _ (s1 ++ [::])).
-        by rewrite /= eq_refl in Hle.
+        apply Hcountle12.
+        move: Hmemw.
+        rewrite !mem_cat.
+        move=> /orP Hmemw.
+        apply/orP.
+        case: Hmemw => [Hmemwxs1|Hmemws2].
+        { left. rewrite inE. apply/orP. by right. }
+        { by right. }
       }
-      {
-        have H : exists2 s3 : seq T, subseq s1 s3 & perm_eq s3 (y::s2).
-        {
-          apply IHs1 => w Hmemw.
-          have Hcw : (count_mem w) (x :: s1) <= (count_mem w) (y :: s2).
-          {
-            apply Hcountle12.
-            move: Hmemw.
-            rewrite !mem_cat.
-            move=> /orP Hmemw.
-            apply/orP.
-            case: Hmemw => [Hmemwxs1|Hmemws2].
-            { left. rewrite inE. apply/orP. by right. }
-            { by right. }
-          }
-          move: Hcw => /= Hcw.
-          by apply (leq_trans (leq_addl _ _) Hcw).
-        }
-        move: H => [s3 Hss13 /permP Hce32].
-        have [sc1 /permP Hce31c1] := perm_to_subseq Hss13.
-        have Hmemxs1c : x \in sc1.
-        {
-          have Hcx : (count_mem x) (x :: s1) <= (count_mem x) (y :: s2).
-          {
-            apply Hcountle12.
-            apply/orP.
-            by left.
-          }
-          move: Hcx.
-          rewrite -Hce32 /= eq_refl /=.
-          rewrite Hce31c1 count_cat addnC leq_add2l.
-          by rewrite -has_count has_pred1.
-        }
-        exists (x :: s1 ++ (rem x sc1)).
-        {
-          rewrite /= eq_refl /=.
-          by apply prefix_subseq.
-        }
-        {
-          rewrite -cat1s perm_catCA cat1s.
-          have Hpr := perm_to_rem Hmemxs1c.
-          rewrite perm_sym in Hpr.
-          rewrite (perm_catl _ Hpr).
-          apply/permP => w.
-          by rewrite -Hce31c1 Hce32.
-        }
-      }
+      move: Hcountw => /= Hcountw.
+      by apply (leq_trans (leq_addl _ _) Hcountw).
     }
+    rewrite /= -cat1s perm_catCA cat1s.
+    rewrite -(perm_catl _ (perm_to_rem _)) //.
+    have Hcountx : (count_mem x) (x :: s1) <= (count_mem x) s2.
+    {
+      apply Hcountle12.
+      by rewrite inE eq_refl.
+    }
+    move: Hcountx.
+    rewrite -(permP aIHs1) /= eq_refl /=.
+    rewrite count_cat addnC leq_add2l.
+    by rewrite -has_count has_pred1.
   Qed.
 End SubseqPerm.
 
