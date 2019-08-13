@@ -2,6 +2,10 @@ Local Set Warnings "-notation-overridden".
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq.
 Local Set Warnings "all".
 
+Set Implicit Arguments.
+Unset Strict Implicit.
+Unset Printing Implicit Defensive.
+
 Section SubseqPerm.
   Variable T : eqType.
   Implicit Type s : seq T.
@@ -56,6 +60,41 @@ Section SubseqPerm.
     rewrite count_cat addnC leq_add2l.
     by rewrite -has_count has_pred1.
   Qed.
-End SubseqPerm.
 
-Arguments subseq_perm {T}.
+
+  Theorem uniq_subseq_perm s1 s2 : subseq_perm s1 s2 -> uniq s2 -> uniq s1.
+  Proof.
+    move=> /subseq_permP [s3 Hss13 Hperm32] Huniqs2.
+    apply (subseq_uniq Hss13).
+    by rewrite (perm_uniq Hperm32).
+  Qed.
+
+
+  Theorem mem_subseq_perm s1 s2 : subseq_perm s1 s2 -> {subset s1 <= s2}.
+  Proof.
+    move=> /subseq_permP [s3 Hss13 Hperm32] x.
+    rewrite -(perm_mem Hperm32).
+    by apply mem_subseq.
+  Qed.
+
+
+  Theorem mem_uniq_subseq_permP s1 s2
+    : uniq s1 -> uniq s2 -> reflect {subset s1 <= s2} (subseq_perm s1 s2).
+  Proof.
+    move=> Huniqs1 Huniqs2.
+    apply/(iffP idP); first by apply mem_subseq_perm.
+    move=> Hss12.
+    apply/allP => x /=.
+    rewrite mem_cat => /orP.
+    rewrite !count_uniq_mem //.
+    case.
+    {
+      move=> Hmemxs1 /=.
+      by rewrite Hmemxs1 (Hss12 _ Hmemxs1).
+    }
+    {
+      move=> -> /=.
+      by apply leq_b1.
+    }
+  Qed.
+End SubseqPerm.
