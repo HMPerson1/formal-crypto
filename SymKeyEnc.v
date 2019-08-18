@@ -26,7 +26,7 @@ Section Theory.
   Hypothesis secure_i : secure i.
   Variable (k0 : K) (m0 : M).
 
-  Theorem ciphertext_size_ge : #|M| <= #|C|.
+  Theorem card_ciphertext_ge : #|M| <= #|C|.
   Proof.
     rewrite -(cardC (mem_seq (image (enc i k0) M))).
     apply/(leq_trans _ (leq_addr _ _)).
@@ -34,7 +34,7 @@ Section Theory.
     by apply (can_inj (correct_i k0)).
   Qed.
 
-  Theorem key_size_ge : #|C| <= #|K|.
+  Theorem card_key_ge : #|C| <= #|K|.
   Proof.
     have find_k : forall c m, exists k, enc i k m == c.
     {
