@@ -34,4 +34,6 @@ jobs:
 
       - name: Run nix-build
         run: |
-          nix-build https://tinyurl.com/math-comp-nix --arg config 'pkgs: {coq = "8.9";  mathcomp = "1.9.0"; formal-crypto = {src = ./.; propagatedBuildInputs = with pkgs.coqPackages [ mathcomp-full ];};}' --argstr package formal-crypto --arg src './.'
+          nix-build https://tinyurl.com/math-comp-nix \
+          --arg config 'pkgs: {coq = "8.9";  mathcomp = "1.9.0"; formal-crypto = {src = ./.; propagatedBuildInputs = with pkgs.coqPackages; [ mathcomp-full ];};}' \
+          --argstr package formal-crypto
