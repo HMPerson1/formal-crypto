@@ -27,3 +27,5 @@ jobs:
         
       - name: Run nix-build
         run: nix-build
+        with:
+          nix_path: nixpkgs=channel:nixpkgs-unstable
