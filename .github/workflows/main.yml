@@ -27,5 +27,10 @@ jobs:
         with:
           nix_path: nixpkgs=channel:nixpkgs-unstable
         
+      - name: Use cachix for mathcomp
+        run: |
+          nix-env -iA nixpkgs.cachix
+          cachix use math-comp
+
       - name: Run nix-build
         run: nix-build
