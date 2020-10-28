@@ -33,4 +33,4 @@ jobs:
           cachix use math-comp
 
       - name: Run nix-build
-        run: nix-build
+        run: nix-build https://tinyurl.com/math-comp-nix --arg config '{coq = "8.9";  mathcomp = "1.9";}'
