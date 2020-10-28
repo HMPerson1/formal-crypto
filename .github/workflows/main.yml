@@ -29,7 +29,7 @@ jobs:
         
       - name: Use cachix for mathcomp
         run: |
-          nix-env -iA nixpkgs.cachix
+          nix-env -iA cachix -f https://cachix.org/api/v1/install
           cachix use math-comp
 
       - name: Run nix-build
