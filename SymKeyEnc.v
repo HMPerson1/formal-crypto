@@ -6,6 +6,7 @@ Local Set Warnings "all".
 Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
+Set Bullet Behavior "Strict Subproofs".
 
 Section Def.
   Variable K M C : finType.
@@ -188,14 +189,11 @@ Section Tuple.
     rewrite /compose /lift_tuple2 /=.
     have cHsecure cm := Hsecure cm.1 cm.2.
     elim: n c m => [|n' IHn] c m.
-    {
-      rewrite expn0.
+    - rewrite expn0.
       rewrite (eq_card1 (x:=[tuple])) // => k.
       rewrite !inE.
       by rewrite [k]tuple0 [c]tuple0 [map_tuple _ _]tuple0.
-    }
-    {
-      rewrite expnS.
+    - rewrite expnS.
       rewrite -(IHn (behead_tuple c) (behead_tuple m)).
       rewrite -(Hsecure (thead c) (thead m)).
       rewrite -cardX.
@@ -206,18 +204,14 @@ Section Tuple.
         => [[headk tailk]].
       rewrite -{1}[(headk, tailk)]can_pttc_tctp (mem_map (bij_inj bij_tctp)) !mem_enum !inE.
       apply/(sameP idP)/(iffP idP).
-      {
-        move=> /andP [Hheadk Htailk].
+      + move=> /andP [Hheadk Htailk].
         apply/eqP/eq_from_tnth => j.
         rewrite [m]tuple_eta [c]tuple_eta.
         rewrite tnth_map tnth_zip /prod_curry.
         move: j => [[|j] Hj].
-        {
-          rewrite (_:Hj=ltn0Sn n'); last by apply bool_irrelevance.
+        * rewrite (_:Hj=ltn0Sn n'); last by apply bool_irrelevance.
           by rewrite !tnth0; apply/eqP.
-        }
-        {
-          rewrite (tnth_nth (headk)) (tnth_nth (thead m)) (tnth_nth (thead c)) /=.
+        * rewrite (tnth_nth (headk)) (tnth_nth (thead m)) (tnth_nth (thead c)) /=.
           rewrite (_ : behead c = behead_tuple c) //.
           rewrite ltnS in Hj.
           pose oj := Ordinal Hj.
@@ -225,22 +219,15 @@ Section Tuple.
           rewrite -!tnth_nth.
           rewrite -(eqP Htailk).
           by rewrite tnth_map tnth_zip /prod_curry.
-        }
-      }
-      {
-        move=> /eqP <- /=.
+      + move=> /eqP <- /=.
         apply/andP; split.
-        { by rewrite /thead tnth_map tnth_zip. }
-        {
-          apply/eqP/eq_from_tnth => j.
+        * by rewrite /thead tnth_map tnth_zip.
+        * apply/eqP/eq_from_tnth => j.
           rewrite tnth_behead !tnth_map !tnth_zip /=.
           rewrite {2}[m]tuple_eta.
           rewrite [tnth _ (inord _)](tnth_nth headk).
           rewrite [tnth _ (inord _)](tnth_nth (thead m)).
           rewrite inordK /=; last by rewrite ltnS.
           by rewrite -!tnth_nth.
-        }
-      }
-    }
   Qed.
 End Tuple.
